@@ -1,0 +1,13 @@
+schema_version = "1.0.0"
+id = "crowd_diversity_pipeline"
+version = "1.0.0"
+name = "Crowd Diversity USD Pipeline"
+tagline = "Batch export rigged garments as USD assets with JSON metadata and simple fit-check poses."
+maintainer = "Alice <alicebian@alumni.upenn.edu>"
+type = "add-on"
+blender_version_min = "5.0.0"
+license = ["SPDX:GPL-3.0-or-later"]
+
+[permissions]
+# Allow the add-on to create and update the user-selected USD asset library folders.
+files = "**/*"
