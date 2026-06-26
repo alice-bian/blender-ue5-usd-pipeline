@@ -11,6 +11,18 @@ else:
     ADDON_ID = "crowd_diversity_pipeline"
 
 
+def _normalize_windows_dir_path(path_value: str) -> str:
+    if os.name != "nt" or not path_value:
+        return path_value
+    return os.path.normpath(path_value).replace("/", "\\")
+
+
+def _update_library_root(self, _context: bpy.types.Context) -> None:
+    normalized = _normalize_windows_dir_path(self.library_root)
+    if normalized != self.library_root:
+        self.library_root = normalized
+
+
 class CROWD_Preferences(bpy.types.AddonPreferences):
     bl_idname = ADDON_ID
 
@@ -18,10 +30,14 @@ class CROWD_Preferences(bpy.types.AddonPreferences):
         name="Library Root",
         description="Folder that will hold exported USD assets and JSON metadata",
         subtype="DIR_PATH",
-        default=os.path.expanduser("~/crowd_diversity_library"),
+        default=_normalize_windows_dir_path(os.path.expanduser("~/crowd_diversity_library")),
+        update=_update_library_root,
     )
 
     def draw(self, context: bpy.types.Context) -> None:
+        normalized = _normalize_windows_dir_path(self.library_root)
+        if normalized != self.library_root:
+            self.library_root = normalized
         layout = self.layout
         layout.prop(self, "library_root")
 
@@ -58,7 +74,18 @@ class CROWD_PT_Panel(bpy.types.Panel):
         box = layout.box()
         box.label(text="Library Output")
         box.prop(prefs, "library_root")
-        box.prop(context.scene, "crowd_diversity_category")
+
+        box = layout.box()
+        box.label(text="Selected Asset Types")
+        selected_meshes = [obj for obj in context.selected_objects if obj.type == "MESH"]
+
+        if not selected_meshes:
+            box.label(text="Select one or more mesh objects to assign types.")
+        else:
+            for obj in selected_meshes:
+                row = box.row(align=True)
+                row.label(text=obj.name)
+                row.prop(obj, "crowd_diversity_category", text="")
 
         layout.separator()
         box = layout.box()

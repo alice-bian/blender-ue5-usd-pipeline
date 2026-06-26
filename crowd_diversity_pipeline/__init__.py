@@ -42,9 +42,9 @@ def register() -> None:
     ):
         bpy.utils.register_class(cls)
 
-    bpy.types.Scene.crowd_diversity_category = bpy.props.EnumProperty(
+    bpy.types.Object.crowd_diversity_category = bpy.props.EnumProperty(
         name="Category",
-        description="Category to use for the next export batch",
+        description="Type for this selected garment or hairstyle",
         items=[(key, label, "") for key, label in CATEGORY_LABELS.items()],
         default="top",
     )
@@ -64,7 +64,7 @@ def unregister() -> None:
     if bpy is None:
         return
 
-    del bpy.types.Scene.crowd_diversity_category
+    del bpy.types.Object.crowd_diversity_category
     del bpy.types.Scene.crowd_diversity_fit_check_pose
 
     for cls in reversed((

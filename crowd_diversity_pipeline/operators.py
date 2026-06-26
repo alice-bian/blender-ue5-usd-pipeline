@@ -42,13 +42,15 @@ class CROWD_OT_ExportAssets(bpy.types.Operator):
             self.report({"ERROR"}, "Choose a library root before exporting.")
             return {"CANCELLED"}
 
+        os.makedirs(library_root, exist_ok=True)
+
         objects = [obj for obj in context.selected_objects if obj.type == "MESH"]
         if not objects:
             self.report({"ERROR"}, "Select one or more mesh objects to export.")
             return {"CANCELLED"}
 
-        category = context.scene.crowd_diversity_category
         for obj in objects:
+            category = obj.crowd_diversity_category
             export_path = build_export_output_path(library_root, category, obj.name)
             export_dir = os.path.dirname(export_path)
             os.makedirs(export_dir, exist_ok=True)
@@ -65,6 +67,16 @@ class CROWD_OT_ExportAssets(bpy.types.Operator):
             )
             write_metadata_sidecar(export_path, metadata)
             self.report({"INFO"}, f"Exported {obj.name} to {export_path}")
+
+        # Clear all selections in the viewport after batch export completes.
+        bpy.ops.object.select_all(action="DESELECT")
+        context.view_layer.objects.active = None
+
+        # Open the output folder in the host OS file explorer.
+        try:
+            bpy.ops.wm.path_open(filepath=library_root)
+        except Exception:
+            self.report({"WARNING"}, "Export finished, but opening Library Root failed.")
 
         return {"FINISHED"}
 
