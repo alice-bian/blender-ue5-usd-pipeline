@@ -61,7 +61,6 @@ class CROWD_PT_Panel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Crowd Diversity"
-    bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context: bpy.types.Context) -> None:
         layout = self.layout
